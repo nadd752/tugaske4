@@ -1,0 +1,18 @@
+---
+title: "My Website"
+---
+Hello !
+
+Welcome Back to Nad's Website
+
+Kali ini kita akan belajar tentang Data Science and Predictive Analystic menggunakan EBImage di Rstudio. Pada website sebelumnya sudah saya jelaskan apa itu EBImage.Untuk mengingat kembali apa itu EBImage ? Ebimage adalah sebuah library yang menyediakan fungsi untuk memproses dan analisis gambar. Nah pada kesempatan ini saya akan coba menganalisis gambar dari Blue Mosque yang merupakan sebuah masjid di istanbul, kota terbesar di turki dan merupakan ibukota kekhalifahan Utsmaniyyah (1453-1923) seperti dibawah ini :
+
+<img src="mosque.jpg"
+     alt="Markdown Monster icon"
+     style="float: center; margin-right: 10px;" />
+     
+Dan juga kita akan menggunakan gambar Kastil Alhambra yang merupakan sebuah kompleks istana sekaligus benteng yang megah dari kekhalifahan bani ummayyah di Granada, Spanyol bagian selatan (dikenal dengan sebutan Al-Andalus ketika benteng ini didirikan), yang mencakup wilayah perbukitan di batas kota Granada.
+
+<img src="al.jpg"
+     alt="Markdown Monster icon"
+     style="float: center; margin-right: 10px;" />

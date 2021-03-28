@@ -1,0 +1,450 @@
+---
+title: "Data Science and Predictive Analystic menggunakan EBImage di Rstudio"
+author: "Nadia Mu'izzatul Ilma | Teknik Informatika - UIN Maulana Malik Ibrahim Malang | Dosen Pengampu : Prof. Dr. Suhartono, M.Kom "
+date: "27 Maret 2021"
+output: html_document
+---
+
+pada bagian ini saya akan coba menjelaskan tentang contoh pemrosesan gambar, manipulasi sprektal, dan pemfilteran menggunakan EBImage.
+
+# 1. Install Package
+```{r}
+#Install package
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("EBImage")
+```
+
+Setelah berhasil menginstall package, selanjutnya memanggil package EBImage menggunakan perintah library.
+
+```{r}
+#panggil package
+library("EBImage")
+
+#Jika  tidak dapat menginstal package EBImage karena alasan apa pun (mis., Sistem operasi atau ketidakcocokan versi),ini bukan masalah karena Anda seharusnya dapat menggunakan paket jpeg sebagai gantinya.
+
+# install.packages("jpeg")
+library(jpeg)
+```
+
+# 2. Sumber Gambar
+
+Jika sudah berhasil terinstall selanjutnya kita memanggil Package tersebut dengan
+
+```{r}
+setwd("D:/Linier A/TugasIBE")
+library(EBImage)
+Image <- readImage('mosque.jpg')
+display(Image)
+```
+
+
+# 3. Membaca, Menampilkan, dan Menuliskan Gambar
+
+Basic R package (“EBImage”) fungsinya mencakup membaca, menulis, dan menampilkan gambar. Gambar dibaca menggunakan fungsi readImage yang menerima input nama file atau URL. Mari kita coba untuk menampilkan satu gambar.
+
+Kita bisa mengimpor gambar dan selanjutnya dapat divisualisasikan menggunakan method=“browser” oleh fungsi display().
+
+```{r}
+img = readImage("mosque.jpg")
+display(img, method="browser")
+```
+
+Dengan menggunakan mouse atau keyboard kita bisa memperbesar, memperkecil, menggeser, dan memutar gambar. 
+
+Disini Kita juga bisa menambahkan teks  diatas gambar karena gambar ditampilkan menggunakan metode plotting R inti, yang memungkinkan kita untuk menggabungkan gambar dengan fungsionalitas plot lainnya.
+
+```{r}
+display(img)
+text(x = 750, y = 6, label = "BLUE MOSQUE", adj = c(0,1), col = "white", cex = 2)
+text(x = 749, y = 3, label = "BLUE MOSQUE", adj = c(0,1), col = "navy", cex = 2)
+```
+
+Gambar yang berisi banyak bingkai dapat ditampilkan sekaligus dalam pengaturan kisi dengan menetapkan argumen fungsi all = TRUE
+
+```{r}
+nuc = readImage(system.file("images", "nuclei.tif", package="EBImage"))
+display(nuc, method = "raster", all = TRUE)
+```
+
+kita juga bisa menampilkannya hanya dalam satu bingkai dengan :
+
+```{r}
+nuc = readImage(system.file("images", "nuclei.tif", package="EBImage"))
+display(nuc, method = "raster")
+```
+
+Untuk mengekspor gambar ke file dengan menggunakan EBImage::writeImage(). misalnya gambar yang kita muat adalah file PNG. maka bisa menggunakan source code berikut :
+
+```{r}
+writeImage(img, "mosque.jpg", quality = 75)
+```
+
+
+# 4. Merepresentasikan Data Gambar
+
+EBImage menggunakan kelas khusus paket Image untuk menyimpan dan memproses gambar. Semua fungsi paket R (“EBImage”) juga bisa dipanggil langsung pada matriks dan array. untuk mengetahui lebih lanjut kelas ini dengan menggunakan :
+
+```{r}
+str(img)
+```
+kita bisa memaksa sebuah image ke array dengan menggunakan source code :
+
+```{r}
+is.Image( as.array(img) )
+```
+
+Distribusi intensitas piksel dapat diplot dalam histogram, dan jangkauannya diperiksa menggunakan range fungsi.
+
+```{r}
+hist(img)
+
+range(img)
+```
+
+Ringakasan image objek juga disediakan oleh showmetode ini, yang akan bisa dipanggil dengan mengetikan nama objek.
+
+```{r}
+img
+```
+
+Untuk representasi yang lebih ringkas tanpa pratinjau larik intensitas, gunakan metode print dengan argumen short disetel ke TRUE.
+
+```{r}
+print(img, short=TRUE)
+```
+
+# 5. Manajemen Warna 
+
+Fungsi colorMode dapat digunakan untuk mengakses dan mengubah properti, yaitu mengubah mode rendering gambar. Sebagai contoh, kita mengganti color gambar menjadi mode gray-scale
+
+```{r}
+colorMode(img) = Grayscale
+display(img, all=TRUE)
+```
+
+Fungsi to RGB mempromosikan gambar skala abu-abu ke ruang warna RGB dengan mereplikasinya di seluruh saluran merah, hijau, dan biru. Untuk menggabungkan tiga gambar skala abu-abu menjadi satu gambar rgb, gunakan fungsi rgbImage.
+
+Fungsi Imageini dapat digunakan untuk membuat gambar berwarna dari vektor karakter atau larik warna R yang memiliki nama.
+
+```{r}
+colorMat = matrix(rep(c("red","green", "#0000ff"), 25), 5, 5)
+colorImg = Image(colorMat)
+colorImg
+
+display(colorImg, interpolate=FALSE)
+```
+
+# 6. Memanipulasi Gambar
+
+Menampilkan gambar negatif dengn mengurangi gambar dari nilai maksimumnya,
+
+```{r}
+img_neg = max(img) - img
+display( img_neg )
+```
+
+Bisa juga meningkatkan kecerahan gambar melalui penambahan, penyesuaian kontras dengan perkalian, dan menerapkan koreksi gamma melalui eksponen.
+
+```{r}
+img_comb = combine(
+  img,
+  img + 0.4,
+  img * 3,
+  img ^ 0.5
+)
+
+display(img_comb, all=TRUE)
+```
+
+Untuk transposisi, dengan mengunakan transpose dari fungsi paket R ("basis") t.
+
+```{r}
+img_t = transpose(img)
+display( img_t )
+```
+
+# 7. Transformasi Spasial
+
+Translate memindahkan bidang gambar dengan vektor dua dimensi yang ditentukan sedemikian rupa sehingga piksel yang berada di luar wilayah gambar dipotong, dan piksel yang masuk ke wilayah gambar disetel ke latar belakang.
+
+```{r}
+img_translate = translate(img, c(150,-70))
+display(img_translate)
+```
+
+Penggunaan argumen ini rotate dapat memutar gambar searah jarum jam dengan sudut yang ditentukan. 
+
+```{r}
+img_rotate = rotate(img, 20, bg.col = "white")
+display(img_rotate)
+```
+
+Disini juga dapat mengubah ukuran gambar dengan menggunakan source code :
+
+```{r}
+img_resize = resize(img, w=450, h=450)
+display(img_resize )
+```
+
+Fungsi flip pencerminan gambar sumbu horizontal dan flop mencerminkan gambar sumbu vertikal. Dengan menggunakan source code :
+
+```{r}
+img_flip = flip(img)
+img_flop = flop(img)
+
+display(combine(img_flip, img_flop), all=TRUE)
+```
+
+# 8. Memberi Filter Gambar
+
+a. Fungsi Make Brush
+
+Dalam r Biocpkg (“EBImage”), konvolusi 2 dimensi diimplementasikan oleh fungsi filter2, dan fungsi tambahan makeBrush dapat digunakan untuk menghasilkan fungsi bobot.
+
+```{r}
+w = makeBrush(size = 31, shape = 'gaussian', sigma = 5)
+plot(w[(nrow(w)+1)/2, ], ylab = "w", xlab = "", cex = 0.7)
+```
+
+b. High-pass filtering 
+
+Merupakan operasi kebalikannya yang memungkinkan untuk mendeteksi tepi dan mempertajam gambar.
+
+```{r}
+fhi = matrix(1, nrow = 3, ncol = 3)
+fhi[2, 2] = -8
+img_fhi = filter2(img, fhi)
+display(img_fhi)
+```
+
+c. Make Noise
+
+Teknik pemfilteran ini disediakan dalam paket R (“EBImage”) oleh fungsinya medianFilter. Pada gambar ini kita memakai noise seragam, dan merekonstruksi gambar asli dengan median filtering
+
+```{r}
+l = length(img)
+n = l/10
+pixels = sample(l, n)
+img_noisy = img
+img_noisy[pixels] = runif(n, min=0, max=1)
+display(img_noisy)
+```
+
+d. Operasi Morfologi
+
+Perasi morfologi Gambar biner adalah gambar yang hanya berisi dua set piksel, dengan nilai, katakanlah 0 dan 1, mewakili piksel latar belakang dan latar depan.
+
+```{r}
+shapes = readImage(system.file('images', 'shapes.png', package='EBImage'))
+logo = shapes[110:512,1:130]
+display(logo)
+
+kern = makeBrush(5, shape='diamond')
+display(kern, interpolate=FALSE)
+
+logo_erode= erode(logo, kern)
+logo_dilate = dilate(logo, kern)
+
+display(combine(logo_erode, logo_dilate), all=TRUE)
+```
+
+# 9. Segmentasi Gambar
+
+Segmentasi gambar melakukan partisi gambar, dan biasanya digunakan untuk mengidentifikasi objek dalam gambar. Objek terhubung yang tidak bersentuhan dapat disegmentasi menggunakan fungsi tersebut bwlabel, sedangkan watershed dan propagate menggunakan algoritma yang lebih canggih dapat memisahkan objek yang saling bersentuhan.
+
+```{r}
+logo_label = bwlabel(logo)
+table(logo_label)
+```
+
+Nilai piksel logo_label rentang gambar dari 0 sesuai dengan latar belakang hingga jumlah objek yang dikandungnya, yang diberikan oleh max(logo_label). Untuk menampilkan gambar kita menormalkannya ke kisaran (0,1) yang diharapkan oleh fungsi tampilan. Ini menghasilkan objek berbeda yang dirender dengan bayangan abu-abu yang berbeda. Bisa juga kita membuat gambar berwarna warni.
+
+
+```{r}
+max(logo_label)
+
+display( normalize(logo_label) )
+
+display( colorLabels(logo_label) )
+```
+
+# 10. Manipulasi Gambar
+
+Objek dapat dihapus dari gambar tersebut dengan rmObject, yang menghapus objek dari topeng hanya dengan mengatur nilai pikselnya ke 0. Secara default, setelah penghapusan objek semua objek yang tersisa diberi label ulang sehingga ID objek tertinggi sesuai dengan jumlah objek di topeng. The reenumerate argumen dapat digunakan untuk mengubah perilaku ini dan untuk melestarikan ID objek asli.
+
+```{r}
+objects = list(
+    seq.int(from = 2, to = max(logo_label), by = 2),
+    seq.int(from = 1, to = max(logo_label), by = 2)
+    )
+logos = combine(logo_label, logo_label)
+z = rmObjects(logos, objects, reenumerate=FALSE)
+display(z, all=TRUE)
+```
+# 11. Segmentasi Gambar
+
+Disini bisa membuat gambar inti dan badan sel. Untuk memvisualisasikan sel, dengan melapisi gambar-gambar ini sebagai saluran hijau dan biru dari gambar berwarna palsu.
+
+```{r}
+nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+
+cells = rgbImage(green=1.5*cel, blue=nuc)
+display(cells, all = TRUE)
+```
+
+Pertama, lakukan segmentasi menggunakan thresh, fillHull, bwlabel dan opening.
+
+```{r}
+nmask = thresh(nuc, w=10, h=10, offset=0.05)
+nmask = opening(nmask, makeBrush(5, shape='disc'))
+nmask = fillHull(nmask)
+nmask = bwlabel(nmask)
+
+display(nmask, all=TRUE)
+```
+
+Selanjutnya, menggunakan inti tersegmentasi sebagai benih dalam segmentasi Voronoi dan sitoplasma
+
+```{r}
+ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+cmask = propagate(cel, seeds=nmask, mask=ctmask)
+
+display(ctmask, all=TRUE)
+```
+
+Untuk memvisualisasikan segmentasi pada objek, menggunakan paintObject
+
+```{r}
+segmented = paintObjects(cmask, cells, col='#ff00ff')
+segmented = paintObjects(nmask, segmented, col='#ffff00')
+
+display(segmented, all=TRUE)
+```
+
+# 12. Implemengtasi Pemrosesan Gambar dan Representasi Spektral Sinyal
+
+Selanjutnya kita akan mencoba mengimplementasi Pemrosesan Gambar dan Representasi Spektral Sinyal dengan menggunakan gambar dari Kastil Alhambra
+
+a. Menginputkan gambar
+
+```{r}
+setwd("D:/Linier A/TugasIBE")
+library(EBImage)
+
+image <- readImage("al.jpg")
+
+display(image, method = "raster", all = TRUE)
+```
+
+b. Intesity Histogram
+
+```{r}
+hist(image)
+```
+
+c. Gambar Negatif
+
+```{r}
+img_neg <- max(image) - image
+display( img_neg )
+```
+
+d. Crop And Threshold
+
+```{r}
+img_crop <- image  
+img_thresh <- img_crop > 0.55
+display(img_thresh)
+```
+
+e. Loww-Pass filter/Smooth 
+
+```{r}
+w <- makeBrush(size = 31, shape = 'gaussian', sigma = 5)
+img_flo <- filter2(image, w)
+display(img_flo)
+```
+
+f. High-Pass Filtering Laplace Filter
+
+```{r}
+fhi <- matrix(1, nrow = 3, ncol = 3)
+fhi[2, 2] <- -7
+img_fhi <- filter2(image, fhi)
+display(img_fhi)
+```
+
+g. Denoising
+
+```{r}
+img_median <- medianFilter(image, size=5, cacheSize=20000)
+display(img_median)
+```
+
+h. Segmentation
+
+```{r}
+grayimage <- channel(image,"gray")
+threshold <- otsu(grayimage)
+CC_th <- combine( mapply(function(frame, th) frame > th, 
+                         getFrames(image), 
+                         threshold, SIMPLIFY=FALSE) )
+display(CC_th, all=TRUE)
+
+
+disc <- makeBrush(51, "disc")
+disc <- disc/sum(disc)
+offset <- 0.0001
+CC_bg <- filter2(image, disc)
+CC_th <- image < CC_bg + offset
+display(CC_th, all=TRUE)
+```
+
+i. Watershed Segmentation
+
+```{r}
+nmask <- watershed(distmap(CC_th), tolerance=5, ext=20)
+display(colorLabels(nmask), all=TRUE)
+```
+
+j. Voronoi Image Tesselation
+
+```{r}
+voronoiExamp <- propagate(x = nmask, seeds = nmask, lambda = 0.001)
+voronoiPaint <- colorLabels (voronoiExamp)
+display(voronoiPaint, all=TRUE)
+
+CC <- rgbImage(green=2.0*CC_bg, blue=img_median, red=voronoiPaint[ , , , 1])
+display(CC, all = TRUE)
+
+ctmask = opening(img_fhi<0.6, makeBrush(5, shape='disc'))
+cmask = propagate(img_fhi, seeds=nmask, mask=ctmask)
+display(ctmask, all=TRUE)
+
+ctmask = opening(img_fhi>0.1, makeBrush(5, shape='disc'))
+cmask = propagate(img_fhi, seeds=nmask, mask=ctmask)
+display(ctmask, all=TRUE)
+
+segmented = paintObjects(channel(cmask,"gray"), image, col='#ff00ff')
+segmented = paintObjects(channel(ctmask,"gray"), segmented, col='#ffff00')
+display(segmented, all=TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

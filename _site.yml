@@ -1,0 +1,12 @@
+name: "my-website"
+navbar:
+  title: "My Website"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Program"
+      href: program.html
+    - text: "Daftar Pustaka"
+      href: dapus.html
+    - text: "About"
+      href: about.html
